@@ -1,0 +1,6 @@
+@SNI_Events_HostAddress = http://localhost:5142
+
+GET {{SNI_Events_HostAddress}}/user/
+Accept: application/json
+
+###

@@ -2,4 +2,4 @@
 /SNI_Events/.vs/*
 
 /bin/*
-/obj/Debug/net8.0/staticwebassets.build.json.cache
+/obj/*

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SNI_Events.Application.Dtos.Event;
 using SNI_Events.Domain.Entities;
+using SNI_Events.Domain.Exceptions;
 using SNI_Events.Domain.Interfaces.Repositories;
 using SNI_Events.Domain.Interfaces.Services;
 
@@ -27,13 +28,16 @@ namespace SNI_Events.Application.Services
 
         public async Task<EventDto> GetByIdAsync(long id)
         {
-            var ev = await _repository.GetByIdAsync(id);
+            var ev = await _repository.GetByIdAsync(id)
+                     ?? throw new NotFoundException("Evento não encontrado");
+
             return _mapper.Map<EventDto>(ev);
         }
 
         public async Task<EventDto> CreateAsync(EventCreateRequestDto dto)
         {
-            var ev = new Event(dto.Name, _currentUser.UserId);
+            var userId = GetCurrentUserIdOrThrow();
+            var ev = new Event(dto.Name, userId);
             await _repository.AddAsync(ev);
             return _mapper.Map<EventDto>(ev);
         }
@@ -41,9 +45,10 @@ namespace SNI_Events.Application.Services
         public async Task<EventDto> UpdateAsync(long id, EventUpdateRequestDto dto)
         {
             var ev = await _repository.GetByIdAsync(id)
-                     ?? throw new Exception("Evento não encontrado");
+                     ?? throw new NotFoundException("Evento não encontrado");
 
-            ev.Update(dto.Name, _currentUser.UserId);
+            var userId = GetCurrentUserIdOrThrow();
+            ev.Update(dto.Name, userId);
             await _repository.UpdateAsync(ev);
 
             return _mapper.Map<EventDto>(ev);
@@ -52,10 +57,16 @@ namespace SNI_Events.Application.Services
         public async Task DeleteAsync(long id)
         {
             var ev = await _repository.GetByIdAsync(id)
-                     ?? throw new Exception("Evento não encontrado");
+                     ?? throw new NotFoundException("Evento não encontrado");
 
-            ev.DeleteUser(_currentUser.UserId); // ou SetDeletionAudit
+            var userId = GetCurrentUserIdOrThrow();
+            ev.DeleteUser(userId); // ou SetDeletionAudit
             await _repository.UpdateAsync(ev);
+        }
+
+        private long GetCurrentUserIdOrThrow()
+        {
+            return _currentUser.UserId ?? throw new InvalidOperationException("Usuário não autenticado.");
         }
     }
 }

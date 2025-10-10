@@ -2,6 +2,7 @@
 using SNI_Events.Application.Dtos.Dinner;
 using SNI_Events.Application.Dtos.Event;
 using SNI_Events.Domain.Entities;
+using SNI_Events.Domain.Exceptions;
 using SNI_Events.Domain.Interfaces.Repositories;
 using SNI_Events.Domain.Interfaces.Services;
 
@@ -40,7 +41,7 @@ public class DinnerService : IDinnerService
     public async Task<DinnerDto> UpdateAsync(long id, DinnerUpdateRequestDto dto)
     {
         var ev = await _repository.GetByIdAsync(id)
-                 ?? throw new Exception("Jantar não encontrado");
+                 ?? throw new NotFoundException("Jantar não encontrado");
 
         ev.Update(dto.Name, dto.Price, _currentUser.UserId);
         await _repository.UpdateAsync(ev);
@@ -51,7 +52,7 @@ public class DinnerService : IDinnerService
     //public async Task DeleteAsync(long id)
     //{
     //    var ev = await _repository.GetByIdAsync(id)
-    //             ?? throw new Exception("Jantar não encontrado");
+    //             ?? throw new NotFoundException("Jantar não encontrado");
 
     //    ev.RemoveUser(_currentUser.UserId); // ou SetDeletionAudit
     //    await _repository.UpdateAsync(ev);

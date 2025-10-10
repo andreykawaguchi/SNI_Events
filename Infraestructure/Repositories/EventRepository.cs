@@ -12,22 +12,6 @@ namespace SNI_Events.Infraestructure.Repository
         public EventRepository(SNIContext context, ICurrentUserService currentUserService)
      : base(context, currentUserService) { }
 
-        public async Task<IEnumerable<Event>> GetAllAsync()
-            => await _vSNIContext.Events.ToListAsync();
-
-        //public async Task<Event?> GetByIdAsync(long id)
-        //    => await _vSNIContext.Events.FindAsync(id);
-
-        //public async Task AddAsync(Event entity)
-        //{
-        //    await _vSNIContext.Events.AddAsync(entity);
-        //    await _vSNIContext.SaveChangesAsync();
-        //}
-
-        //public async Task UpdateAsync(Event entity)
-        //{
-        //    _vSNIContext.Events.Update(entity);
-        //    await _vSNIContext.SaveChangesAsync();
-        //}
+        // Use base implementation from BaseRepository<Event>
     }
 }

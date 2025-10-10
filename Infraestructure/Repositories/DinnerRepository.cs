@@ -11,23 +11,5 @@ namespace SNI_Events.Infraestructure.Repository
     {
         public DinnerRepository(SNIContext context, ICurrentUserService currentUserService)
      : base(context, currentUserService) { }
-
-        public async Task<IEnumerable<Dinner>> GetAllAsync()
-            => await _vSNIContext.Dinners.ToListAsync();
-
-        //public async Task<Event?> GetByIdAsync(long id)
-        //    => await _vSNIContext.Events.FindAsync(id);
-
-        //public async Task AddAsync(Event entity)
-        //{
-        //    await _vSNIContext.Events.AddAsync(entity);
-        //    await _vSNIContext.SaveChangesAsync();
-        //}
-
-        //public async Task UpdateAsync(Event entity)
-        //{
-        //    _vSNIContext.Events.Update(entity);
-        //    await _vSNIContext.SaveChangesAsync();
-        //}
     }
 }

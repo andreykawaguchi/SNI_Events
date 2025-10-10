@@ -9,6 +9,8 @@ namespace SNI_Events.Application.Mappings
         public UserProfile() // Provide a constructor with a body
         {
             CreateMap<User, UserDto>().ReverseMap(); // Correctly use AutoMapper's CreateMap method
+            CreateMap<UserCreateRequestDto, User>();
+            CreateMap<UserUpdateRequestDto, User>();
         }
     }
 }

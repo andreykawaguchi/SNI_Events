@@ -54,6 +54,11 @@ public abstract class BaseRepository<TEntity> : IRepositoryBase<TEntity> where T
         return await DbSet.AsNoTracking().Where(predicate).ToListAsync();
     }
 
+    public async Task<IEnumerable<TEntity>> GetAllAsync()
+    {
+        return await DbSet.AsNoTracking().ToListAsync();
+    }
+
     public async Task<TEntity?> GetByIdAsync(long Id)
     {
         var result = await _vSNIContext.Set<TEntity>().FindAsync(Id);

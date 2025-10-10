@@ -5,7 +5,7 @@
         public int CurrentPage { get; set; }
         public int PageSize { get; set; }
         public int TotalCount { get; set; }
-        public IEnumerable<T> Items { get; set; } = [];
+        public IEnumerable<T> Items { get; set; } = Array.Empty<T>();
 
         public PagedResultDto(IEnumerable<T> items, int count, int pageNumber, int pageSize)
         {

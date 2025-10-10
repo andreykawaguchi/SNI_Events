@@ -20,30 +20,30 @@ namespace SNI_Events.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] UserCreateRequestDto request)
         {
-            var user = await _userService.CreateAsync(request.Name, request.Email, request.Password, request.PhoneNumber, request.CPF);
-            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+            var userDto = await _userService.CreateAsync(request.Name, request.Email, request.Password, request.PhoneNumber, request.CPF);
+            return CreatedAtAction(nameof(GetById), new { id = 0 /* id not exposed in DTO */ }, userDto);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(long id, [FromBody] UserUpdateRequestDto request)
         {
-            var user = await _userService.UpdateAsync(id, request.Name, request.Email, request.PhoneNumber, request.CPF);
-            return Ok(user);
+            var userDto = await _userService.UpdateAsync(id, request.Name, request.Email, request.PhoneNumber, request.CPF);
+            return Ok(userDto);
         }
 
         [HttpPut("ChangePassword/{id}")]
         public async Task<IActionResult> ChangePassword(long id, [FromBody] UserChangePasswordRequestDto request)
         {
-            var user = await _userService.ChangePasswordAsync(id, request.Password);
-            return Ok(user);
+            var userDto = await _userService.ChangePasswordAsync(id, request.Password);
+            return Ok(userDto);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(long id)
         {
-            var user = await _userService.GetByIdAsync(id);
-            if (user == null) return NotFound();
-            return Ok(user);
+            var userDto = await _userService.GetByIdAsync(id);
+            if (userDto == null) return NotFound();
+            return Ok(userDto);
         }
 
         [HttpDelete("{id}")]

@@ -12,16 +12,16 @@ namespace SNI_Events.Infraestructure.Repository
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
         public UserRepository(SNIContext context, ICurrentUserService currentUserService)
-    : base(context, currentUserService) { }
+        : base(context, currentUserService) { }
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await DbSet.FirstOrDefaultAsync(u => u.Email == email);
+            return await DbSet.FirstOrDefaultAsync(u => u.Email.Address == email);
         }
 
         public async Task<bool> ExistsByCpfAsync(string cpf)
         {
-            return await DbSet.AnyAsync(u => u.CPF == cpf);
+            return await DbSet.AnyAsync(u => u.Cpf.Number == cpf);
         }
 
         public async Task<List<User>> GetAllAsync(UserFilterDto filter)
@@ -58,7 +58,7 @@ namespace SNI_Events.Infraestructure.Repository
                 query = query.Where(u => u.Name.Contains(filter.Name));
 
             if (!string.IsNullOrEmpty(filter.Email))
-                query = query.Where(u => u.Email.Contains(filter.Email));
+                query = query.Where(u => u.Email.Address.Contains(filter.Email));
 
             return query;
         }

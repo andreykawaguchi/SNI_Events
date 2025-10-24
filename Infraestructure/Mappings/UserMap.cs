@@ -16,17 +16,33 @@ namespace SNI_Events.Infraestructure.Mappings
                    .IsRequired()
                    .HasMaxLength(100);
 
+            // Value Object: Email
             builder.Property(u => u.Email)
+                   .HasConversion(
+                       e => e.Address,
+                       e => new SNI_Events.Domain.ValueObjects.Email(e))
                    .IsRequired()
                    .HasMaxLength(150);
 
+            // Value Object: Password
             builder.Property(u => u.Password)
+                   .HasConversion(
+                       p => p.Hash,
+                       p => new SNI_Events.Domain.ValueObjects.Password(p))
                    .IsRequired();
 
+            // Value Object: PhoneNumber
             builder.Property(u => u.PhoneNumber)
+                   .HasConversion(
+                       pn => pn.Number,
+                       pn => new SNI_Events.Domain.ValueObjects.PhoneNumber(pn))
                    .HasMaxLength(20);
 
-            builder.Property(u => u.CPF)
+            // Value Object: Cpf
+            builder.Property(u => u.Cpf)
+                   .HasConversion(
+                       c => c.Number,
+                       c => new SNI_Events.Domain.ValueObjects.Cpf(c))
                    .HasMaxLength(14);
 
             builder.Property(u => u.Role)

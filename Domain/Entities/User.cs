@@ -1,21 +1,21 @@
 ﻿using SNI_Events.Domain.Entities.Base;
 using SNI_Events.Domain.Enum;
+using SNI_Events.Domain.ValueObjects;
 
 namespace SNI_Events.Domain.Entities
 {
     public class User : EntityBase
     {
         public string Name { get; private set; }
-        public string Email { get; private set; }
-        public string Password { get; private set; }
-        public string PhoneNumber { get; private set; }
-        public string CPF { get; private set; }
-        public string Role { get; private set; } = "User"; // Padrão é "User", pode ser alterado para "Admin" ou outros
+        public Email Email { get; private set; }
+        public Password Password { get; private set; }
+        public PhoneNumber PhoneNumber { get; private set; }
+        public Cpf Cpf { get; private set; }
+        public string Role { get; private set; } = "User";
 
         public ICollection<ScheduledEvent> ScheduledEvents { get; private set; } = new List<ScheduledEvent>();
         public ICollection<UserDinner> UserDinners { get; private set; } = new List<UserDinner>();
 
-        // Construtor vazio exigido pelo EF Core
         protected User() { }
 
         public User(
@@ -25,40 +25,43 @@ namespace SNI_Events.Domain.Entities
             string phoneNumber,
             string cpf,
             long? createdByUserId,
-            string role = "User" // Padrão é "User", pode ser alterado para "Admin" ou outros
-        )
+            string role = "User")
         {
-            Name = name;
-            Email = email;
-            Password = password;
-            PhoneNumber = phoneNumber;
-            CPF = cpf;
-            Role = role;
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Nome não pode estar vazio.", nameof(name));
 
-            SetCreationAudit(createdByUserId); // da EntityBase
+            Name = name;
+            Email = new Email(email);
+            Password = Password.Create(password);
+            PhoneNumber = new PhoneNumber(phoneNumber);
+            Cpf = new Cpf(cpf);
+            Role = role ?? "User";
+
+            SetCreationAudit(createdByUserId);
         }
 
         public void Update(
             string name,
-            string email,
             string phoneNumber,
-            string cpf,
-            long? modifiedByUserId,
-            string role = "User" // Padrão é "User", pode ser alterado para "Admin" ou outros
-        )
+            string role = "User",
+            long? modifiedByUserId = null)
         {
-            Name = name;
-            Email = email;
-            PhoneNumber = phoneNumber;
-            CPF = cpf;
-            Role = role;
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Nome não pode estar vazio.", nameof(name));
 
-            SetModificationAudit(modifiedByUserId); // da EntityBase
+            Name = name;
+            PhoneNumber = new PhoneNumber(phoneNumber);
+            Role = role ?? "User";
+
+            SetModificationAudit(modifiedByUserId);
         }
 
         public void ChangePassword(string newPassword, long? modifiedByUserId)
         {
-            Password = newPassword;
+            if (string.IsNullOrWhiteSpace(newPassword))
+                throw new ArgumentException("Senha não pode estar vazia.", nameof(newPassword));
+
+            Password = Password.Create(newPassword);
             SetModificationAudit(modifiedByUserId);
         }
 

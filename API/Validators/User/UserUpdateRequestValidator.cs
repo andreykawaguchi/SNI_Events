@@ -14,10 +14,6 @@ namespace SNI_Events.API.Validators.User
                 .NotEmpty().WithMessage("O e-mail é obrigatório.")
                 .EmailAddress().WithMessage("E-mail inválido.");
 
-            RuleFor(x => x.PhoneNumber)
-                .NotEmpty().WithMessage("O telefone é obrigatório.")
-                .Matches(@"^\d{10,11}$").WithMessage("O telefone deve conter 10 ou 11 dígitos numéricos.");
-
             RuleFor(x => x.CPF)
                 .NotEmpty().WithMessage("O CPF é obrigatório.")
                 .Length(11).WithMessage("O CPF deve conter 11 dígitos.")

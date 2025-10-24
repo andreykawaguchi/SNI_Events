@@ -20,7 +20,8 @@ namespace SNI_Events.Domain.Specifications
             if (string.IsNullOrWhiteSpace(_email))
                 return query;
 
-            return query.Where(u => u.Email.Address.Contains(_email));
+            // Use AsEnumerable to bring data to memory for value object comparison
+            return query.AsEnumerable().Where(u => u.Email.Address.Contains(_email)).AsQueryable();
         }
     }
 }

@@ -19,9 +19,9 @@ namespace SNI_Events.API.Validators.User
                 .NotEmpty().WithMessage("A senha é obrigatória.")
                 .MinimumLength(6).WithMessage("A senha deve ter pelo menos 6 caracteres.");
 
-            RuleFor(x => x.PhoneNumber)
-                .NotEmpty().WithMessage("O telefone é obrigatório.")
-                .Matches(@"^\d{10,11}$").WithMessage("O telefone deve conter 10 ou 11 dígitos numéricos.");
+            //RuleFor(x => x.PhoneNumber)
+            //    .NotEmpty().WithMessage("O telefone é obrigatório.")
+            //    .Matches(@"^\d{10,11}$").WithMessage("O telefone deve conter 10 ou 11 dígitos numéricos.");
 
             RuleFor(x => x.CPF)
                 .NotEmpty().WithMessage("O CPF é obrigatório.")

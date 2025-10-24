@@ -11,13 +11,7 @@ namespace SNI_Events.Domain.ValueObjects
 
         public PhoneNumber(string number)
         {
-            if (string.IsNullOrWhiteSpace(number))
-                throw new ArgumentException("Telefone não pode estar vazio.", nameof(number));
-
-            if (number.Length < 10 || number.Length > 15)
-                throw new ArgumentException("Telefone deve conter entre 10 e 15 dígitos.", nameof(number));
-
-            Number = number.Trim();
+            Number = number?.Trim() ?? string.Empty;
         }
 
         public override bool Equals(object? obj)

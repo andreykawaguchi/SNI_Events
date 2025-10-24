@@ -33,7 +33,7 @@ namespace SNI_Events.Domain.Entities
             Name = name;
             Email = new Email(email);
             Password = Password.Create(password);
-            PhoneNumber = new PhoneNumber(phoneNumber);
+            PhoneNumber = string.IsNullOrWhiteSpace(phoneNumber) ? new PhoneNumber("") : new PhoneNumber(phoneNumber);
             Cpf = new Cpf(cpf);
             Role = role ?? "User";
 
@@ -50,7 +50,7 @@ namespace SNI_Events.Domain.Entities
                 throw new ArgumentException("Nome não pode estar vazio.", nameof(name));
 
             Name = name;
-            PhoneNumber = new PhoneNumber(phoneNumber);
+            PhoneNumber = string.IsNullOrWhiteSpace(phoneNumber) ? new PhoneNumber("") : new PhoneNumber(phoneNumber);
             Role = role ?? "User";
 
             SetModificationAudit(modifiedByUserId);

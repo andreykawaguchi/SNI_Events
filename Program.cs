@@ -2,6 +2,7 @@
 using Microsoft.OpenApi.Models;
 using SNI_Events.API.Configuration;
 using SNI_Events.API.Configuration.DependencyInjection;
+using SNI_Events.API.Middleware;
 using SNI_Events.Infraestructure.Context;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +56,9 @@ builder.Services.AddSwaggerGen(options =>
 
 
 var app = builder.Build();
+
+// Adicionar middleware de tratamento de exceções global
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseCors("DefaultCorsPolicy");
 app.UseAuthentication();

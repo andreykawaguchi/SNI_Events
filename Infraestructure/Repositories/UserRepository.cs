@@ -16,51 +16,56 @@ namespace SNI_Events.Infraestructure.Repository
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await DbSet.FirstOrDefaultAsync(u => u.Email.Address == email);
+            var users = await DbSet.AsNoTracking().ToListAsync();
+            return users.FirstOrDefault(u => u.Email.Address == email);
         }
 
         public async Task<bool> ExistsByCpfAsync(string cpf)
         {
-            return await DbSet.AnyAsync(u => u.Cpf.Number == cpf);
+            var users = await DbSet.AsNoTracking().ToListAsync();
+            return users.Any(u => u.Cpf.Number == cpf);
         }
 
         public async Task<List<User>> GetAllAsync(UserFilterDto filter)
         {
-            var query = FilterBy(filter);
-
-            var users = await query
-                .OrderBy(u => u.Name)
-                .ToListAsync();
-
-            return users;
-        }
-
-        public async Task<PagedResultDto<User>> GetPagedAsync(UserFilterDto filter)
-        {
-            var query = FilterBy(filter);
-
-            var totalCount = await query.CountAsync();
-
-            var users = await query
-                .OrderBy(u => u.Name)
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .ToListAsync();
-
-            return new PagedResultDto<User>(users, totalCount, filter.PageNumber, filter.PageSize);
-        }
-
-        private IQueryable<User> FilterBy(UserFilterDto filter)
-        {
-            var query = _vSNIContext.Users.AsQueryable();
+            var query = _vSNIContext.Users.AsNoTracking();
 
             if (!string.IsNullOrEmpty(filter.Name))
                 query = query.Where(u => u.Name.Contains(filter.Name));
 
-            if (!string.IsNullOrEmpty(filter.Email))
-                query = query.Where(u => u.Email.Address.Contains(filter.Email));
+            // For Email filtering, we need to bring to memory first
+            var users = await query.ToListAsync();
 
-            return query;
+            if (!string.IsNullOrEmpty(filter.Email))
+                users = users.Where(u => u.Email.Address.Contains(filter.Email)).ToList();
+
+            return users.OrderBy(u => u.Name).ToList();
+        }
+
+        public async Task<PagedResultDto<User>> GetPagedAsync(UserFilterDto filter)
+        {
+            var query = _vSNIContext.Users.AsNoTracking();
+
+            if (!string.IsNullOrEmpty(filter.Name))
+                query = query.Where(u => u.Name.Contains(filter.Name));
+
+            // Load all matching users first
+            var allUsers = await query.ToListAsync();
+
+            // Apply email filter in-memory
+            if (!string.IsNullOrEmpty(filter.Email))
+                allUsers = allUsers.Where(u => u.Email.Address.Contains(filter.Email)).ToList();
+
+            var totalCount = allUsers.Count;
+
+            // Then apply pagination
+            var users = allUsers
+                        .OrderBy(u => u.Name)
+                        .Skip((filter.PageNumber - 1) * filter.PageSize)
+                        .Take(filter.PageSize)
+                        .ToList();
+
+            return new PagedResultDto<User>(users, totalCount, filter.PageNumber, filter.PageSize);
         }
     }
 }

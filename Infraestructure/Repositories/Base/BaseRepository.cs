@@ -4,6 +4,7 @@ using SNI_Events.Domain.Entities.Base;
 using SNI_Events.Domain.Enum;
 using SNI_Events.Domain.Interfaces.Repositories.Base;
 using SNI_Events.Domain.Interfaces.Services;
+using SNI_Events.Domain.Interfaces.Specifications;
 using SNI_Events.Infraestructure.Context;
 using System.Linq.Expressions;
 
@@ -27,8 +28,8 @@ public abstract class BaseRepository<TEntity> : IRepositoryBase<TEntity> where T
         _ = entity ?? throw new ArgumentNullException(nameof(entity));
 
         await DbSet.AddAsync(entity);
-        await _vSNIContext.SaveChangesAsync();
-        return entity;
+        // Nota: SaveChanges será chamado via UnitOfWork.CommitAsync()
+        return await Task.FromResult(entity);
     }
 
     public async Task<TEntity> DeleteAsync(TEntity entity)
@@ -45,8 +46,8 @@ public abstract class BaseRepository<TEntity> : IRepositoryBase<TEntity> where T
             throw new InvalidOperationException("A entidade não herda de EntityBase e não pode ser auditada.");
         }
 
-        await _vSNIContext.SaveChangesAsync();
-        return entity;
+        // Nota: SaveChanges será chamado via UnitOfWork.CommitAsync()
+        return await Task.FromResult(entity);
     }
 
     public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate)
@@ -79,7 +80,7 @@ public abstract class BaseRepository<TEntity> : IRepositoryBase<TEntity> where T
             DetachLocalIfTracked(entityBase.Id);
 
             _vSNIContext.Entry(entity).State = EntityState.Modified;
-            await _vSNIContext.SaveChangesAsync();
+            // Nota: SaveChanges será chamado via UnitOfWork.CommitAsync()
 
             return entity;
         }
@@ -87,6 +88,28 @@ public abstract class BaseRepository<TEntity> : IRepositoryBase<TEntity> where T
         {
             throw; // preserva stack trace original
         }
+    }
+
+    /// <summary>
+    /// Busca uma entidade usando Specification Pattern
+    /// </summary>
+    public async Task<TEntity?> FindBySpecificationAsync(ISpecification<TEntity> specification)
+    {
+        _ = specification ?? throw new ArgumentNullException(nameof(specification));
+        
+        var query = specification.ToQuery(DbSet.AsQueryable());
+        return await query.FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Busca múltiplas entidades usando Specification Pattern
+    /// </summary>
+    public async Task<IEnumerable<TEntity>> FindAllBySpecificationAsync(ISpecification<TEntity> specification)
+    {
+        _ = specification ?? throw new ArgumentNullException(nameof(specification));
+        
+        var query = specification.ToQuery(DbSet.AsNoTracking().AsQueryable());
+        return await query.ToListAsync();
     }
 
     private void DetachLocalIfTracked(long id)

@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Application\Validators\UseCases\" />
     <Folder Include="Infraestructure\Repository\Base\" />
   </ItemGroup>
 

@@ -55,8 +55,12 @@ namespace SNI_Events.Application.Services
                 CPF = cpf
             };
 
-            var user = await _createUserUseCase.ExecuteAsync(request, _currentUser.UserId);
-            return _mapper.Map<UserDto>(user);
+            var result = await _createUserUseCase.ExecuteAsync(request, _currentUser.UserId);
+            
+            if (!result.IsSuccess)
+                throw new InvalidOperationException(result.Error);
+
+            return _mapper.Map<UserDto>(result.Value);
         }
 
         public async Task<UserDto> UpdateAsync(long id, string name, string email, string phone, string cpf)
@@ -68,20 +72,31 @@ namespace SNI_Events.Application.Services
                 Role = "User"
             };
 
-            var user = await _updateUserUseCase.ExecuteAsync(id, request, _currentUser.UserId);
-            return _mapper.Map<UserDto>(user);
+            var result = await _updateUserUseCase.ExecuteAsync(id, request, _currentUser.UserId);
+            
+            if (!result.IsSuccess)
+                throw new InvalidOperationException(result.Error);
+
+            return _mapper.Map<UserDto>(result.Value);
         }
 
         public async Task<UserDto> ChangePasswordAsync(long id, string password)
         {
-            await _changePasswordUseCase.ExecuteAsync(id, password, _currentUser.UserId);
+            var result = await _changePasswordUseCase.ExecuteAsync(id, password, _currentUser.UserId);
+            
+            if (!result.IsSuccess)
+                throw new InvalidOperationException(result.Error);
+
             var user = await _getUserByIdUseCase.ExecuteAsync(id);
             return _mapper.Map<UserDto>(user);
         }
 
         public async Task DeleteAsync(long id)
         {
-            await _deleteUserUseCase.ExecuteAsync(id, _currentUser.UserId);
+            var result = await _deleteUserUseCase.ExecuteAsync(id, _currentUser.UserId);
+            
+            if (!result.IsSuccess)
+                throw new InvalidOperationException(result.Error);
         }
 
         public async Task<UserDto?> GetByIdAsync(long id)

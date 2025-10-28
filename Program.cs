@@ -69,7 +69,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerDocumentation();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "SNI_Events API v1");
+        c.RoutePrefix = string.Empty; // Faz o Swagger abrir na raiz (/)
+    });
 }
 
 app.UseHttpsRedirection();
